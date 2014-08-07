@@ -34,7 +34,7 @@ app.factory('PollsService', ['$http', function($http) {
 
         submitVote: function(pollId, answerIndex) {
 
-            var toUpdate = { 'pollId': pollId, 'answerIndex': answerIndex };
+            var toUpdate = { 'pollId': pollId, 'answerIndex': answerIndex, 'guid': localStorage.getItem("guid") };
             var promise = $http.put('/api/poll/' + pollId, toUpdate).then(function(res) {
                 console.log(res);
                 return res.data;

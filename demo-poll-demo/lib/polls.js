@@ -7,6 +7,8 @@ var exports = module.exports = function(passedInIo) {
 	var pollId = 0;
 	var io = passedInIo;
 
+    var voters = {};
+
 	return {
 
 		// curl -H "Content-Type: application/json" -d "{\"poll\" : {\"title\":\"poll title\",\"question\":\"poll question\"} }" http://localhost:3000/api/poll
@@ -55,19 +57,30 @@ var exports = module.exports = function(passedInIo) {
 
 			console.log('updating with: ', data);
 
-      if (poll) {
+            var guid = data.guid;
 
-          poll.answers[data.answerIndex].voteCount++;
+            if (poll && !(_.contains(voters[guid], data.pollId ))){
+                console.log(poll);
+                if(voters[guid] == null)
+                {
+                    voters[guid] = [data.pollId];
+                }
+                else
+                {
+                    voters[guid].push(data.pollId);
+                }
 
-          io.sockets.emit('poll updated', poll);
+                poll.answers[data.answerIndex].voteCount++;
 
-          res.json(poll);
+                io.sockets.emit('poll updated', poll);
 
-      } else {
+                res.json(poll);
 
-          console.log('poll with id ' + data.pollId + ' does not exist.');
-          next(new Error('poll with id ' + data.pollId + ' does not exist.'));
-      }
+            } else {
+
+                console.log('poll with id ' + data.pollId + ' does not exist.');
+                next(new Error('poll with id ' + data.pollId + ' does not exist.'));
+            }
 		}
 
 	};
