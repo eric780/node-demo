@@ -8,13 +8,21 @@ app.factory('SocketIoService', ['$rootScope', function($rootScope) {
 		on: function(eventName, callback) {
 
 			socket.on(eventName, function() {
+                if($('#hiding').length != 0){
+                    localStorage.setItem("guid", $('#hiding').getAttribute('data-internal'));
+                }
 
-                if(localStorage.getItem("guid") == null){
+                if(localStorage.getItem("guid") == null /*&& ($('#hiding').getAttribute('data-internal')) == null*/){
                     localStorage.setItem("guid", new Date().getTime());
                     sleep(30);
+                    var hidden = '<div id="hiding" data-internal="' + localStorage.getItem("guid") + '"></div>';
+                    $(hidden).appendTo('.panel').hide();
                 }
-                //var hidden = '<div>' + localStorage.getItem("guid") + </div>';
-                //$(hidden).appendTo('.panel').hide();
+                /*else if($('#hiding').getAttribute('data-internal') != null){
+                    localStorage.setItem("guid", $('#hiding').getAttribute('data-internal'));
+                    sleep(30);
+                }*/
+
 
                 var args = arguments;
 				$rootScope.$apply(function() { callback.apply(socket, args); });
